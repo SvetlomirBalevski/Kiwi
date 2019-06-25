@@ -21,15 +21,15 @@ from tcms.kiwi_auth.models import UserActivationKey
 
 User = get_user_model()  # pylint: disable=invalid-name
 
-
+# pylint: disable=R4511
 class LoginViewWithCustomTemplate(views.LoginView):
     def get_template_names(self):
         return ['registration/custom_login.html', 'registration/login.html']
 
 
+# pylint: disable=R4511
 class PasswordResetView(views.PasswordResetView):
     form_class = forms.PasswordResetForm
-
 
 @require_http_methods(['GET', 'POST'])
 def register(request):
