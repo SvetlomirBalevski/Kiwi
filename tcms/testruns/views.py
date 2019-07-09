@@ -587,6 +587,7 @@ class AddCasesToRunView(View):
 
 
 @require_GET
+@permission_required('testruns.add_testrun')
 def cc(request, run_id):  # pylint: disable=invalid-name
     """Add or remove cc from a test run"""
 
