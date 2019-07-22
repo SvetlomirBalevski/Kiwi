@@ -3,14 +3,19 @@
 
 from http import HTTPStatus
 
-from django.urls import reverse
 from django.contrib.auth.models import Permission
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from tcms.tests.factories import TagFactory
-from tcms.tests.factories import UserFactory
-from tcms.tests import remove_perm_from_user
 from tcms.tests import BasePlanCase
+from tcms.tests import remove_perm_from_user, user_should_have_perm
+from tcms.tests.factories import ClassificationFactory
+from tcms.tests.factories import PlanTypeFactory
+from tcms.tests.factories import ProductFactory
+from tcms.tests.factories import TagFactory
+from tcms.tests.factories import TestPlanFactory
+from tcms.tests.factories import UserFactory
+from tcms.tests.factories import VersionFactory
 from tcms.utils.permissions import initiate_user_with_default_setups
 
 
@@ -56,3 +61,34 @@ class TestViewPlanTags(BasePlanCase):
         # assert tag actions are shown
         self.assertNotContains(response, 'Add Tag')
         self.assertContains(response, '<span class="disabled grey">%s</span>' % _('Remove'))
+
+
+class TestAddAttachmentView(BasePlanCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.classification = ClassificationFactory(name='Auto')
+        cls.product = ProductFactory(name='test', classification=cls.classification)
+        cls.product_version = VersionFactory(value='0.1', product=cls.product)
+        cls.plan_type = PlanTypeFactory()
+
+        cls.test_plan = TestPlanFactory(name='another test plan for testing',
+                                        author=cls.tester,
+                                        product=cls.product,
+                                        type=cls.plan_type)
+        cls.plan_id = cls.test_plan.pk
+
+    def test_add_attachments_view_with_permissions(self):
+        user_should_have_perm(self.tester, 'attachments.add_attachment')
+        location = reverse('plan-attachment',
+                           args=[self.plan_id])
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_plan_attachment_missing_priviliges(self):
+        remove_perm_from_user(self.tester, 'attachments.add_attachment')
+        location = reverse('plan-attachment',
+                           args=[self.plan_id])
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
