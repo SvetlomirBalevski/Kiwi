@@ -6,6 +6,9 @@ from http import HTTPStatus
 from django import test
 from django.conf import settings
 from django.contrib.auth.models import Permission
+from django.contrib import auth
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 from tcms.testruns.models import TestExecutionStatus
 from tcms.testcases.models import TestCaseStatus
@@ -227,3 +230,46 @@ class BaseCaseRun(BasePlanCase):
         cls.execution_4 = executions[3]
         cls.execution_5 = executions[4]
         cls.execution_6 = executions[5]
+
+
+@classmethod
+class GetListOffAllPossiblePermissions:
+
+    # Helper class for getting all possible permissions
+    # Taken from:
+    # timonweb.com/posts/how-to-get-a-list-of-all-user-permissions-available-in-django-based-project/
+
+    def handle(self, *args, **options):
+        permissions = set()
+
+        tmp_superuser = get_user_model()(
+            is_active=True,
+            is_superuser=True
+        )
+
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(tmp_superuser))
+
+        sorted_list_of_permissions = sorted(list(permissions))
+
+        return sorted_list_of_permissions
+
+class CreateTestUsers(LoggedInTestCase):
+    "Base test class for user creation"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+    def createUserWithNoPermissions(self):
+        for perm in GetListOffAllPossiblePermissions.handle():
+            remove_perm_from_user(self.tester, perm)
+
+        return self.tester
+
+    def createUserWithAllPermissions(self):
+        for perm in GetListOffAllPossiblePermissions.handle():
+            user_should_have_perm(self.tester, perm)
+            
+        return self.tester
