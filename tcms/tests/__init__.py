@@ -232,8 +232,7 @@ class BaseCaseRun(BasePlanCase):
         cls.execution_6 = executions[5]
 
 
-@classmethod
-class GetListOffAllPossiblePermissions:
+class GetListOffAllPossiblePermissions(BaseCommand):
 
     # Helper class for getting all possible permissions
     # Taken from:
@@ -255,15 +254,17 @@ class GetListOffAllPossiblePermissions:
 
         return sorted_list_of_permissions
 
+
 class CreateTestUsers(LoggedInTestCase):
-    "Base test class for user creation"
+    """Base test class for user creation"""
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super(CreateTestUsers, cls).setUpTestData()
 
     def createUserWithNoPermissions(self):
-        for perm in GetListOffAllPossiblePermissions.handle():
+        parameters = GetListOffAllPossiblePermissions.handle()
+        for perm in parameters():
             remove_perm_from_user(self.tester, perm)
 
         return self.tester
@@ -271,5 +272,5 @@ class CreateTestUsers(LoggedInTestCase):
     def createUserWithAllPermissions(self):
         for perm in GetListOffAllPossiblePermissions.handle():
             user_should_have_perm(self.tester, perm)
-            
+
         return self.tester
