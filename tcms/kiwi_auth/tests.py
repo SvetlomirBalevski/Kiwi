@@ -73,14 +73,14 @@ class TestLogout(TestCase):
     def test_logout_redirects_to_login_page(self):
         self.client.login(  # nosec:B106:hardcoded_password_funcarg
             username=self.tester.username,
-            password='password')
+            password='passwordpasswordpassword')
         response = self.client.get(self.logout_url, follow=True)
         self.assertRedirects(response, reverse('tcms-login'))
 
     def test_logout_then_goto_next(self):
         self.client.login(  # nosec:B106:hardcoded_password_funcarg
             username=self.tester.username,
-            password='password')
+            password='passwordpasswordpassword')
         next_url = reverse('tcms-login') + '?next=' + reverse('plans-search')
         response = self.client.get(self.logout_url, {'next': next_url}, follow=True)
         self.assertRedirects(response, next_url)
@@ -103,8 +103,8 @@ class TestRegistration(TestCase):
 
             response = self.client.post(self.register_url,
                                         {'username': username,
-                                         'password1': 'password',
-                                         'password2': 'password',
+                                         'password1': 'passwordpasswordpassword',
+                                         'password2': 'passwordpasswordpassword',
                                          'email': 'new-tester@example.com'},
                                         follow=follow)
 

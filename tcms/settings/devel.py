@@ -42,3 +42,12 @@ MEDIA_ROOT = os.path.join(TCMS_ROOT_PATH, '..', 'uploads')  # noqa: F405
 INTERNAL_IPS = ('127.0.0.1', )
 
 STATICFILES_STORAGE = 'tcms.tests.storage.RaiseWhenFileNotFound'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 15,
+        }
+    }
+    ]

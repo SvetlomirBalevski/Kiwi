@@ -18,7 +18,7 @@ class TestUserAdmin(LoggedInTestCase):
 
         cls.admin = UserFactory()
         cls.admin.is_superuser = True
-        cls.admin.set_password('admin-password')
+        cls.admin.set_password('admin-passwordpasswordpassword')
         cls.admin.save()
 
     def test_non_admin_cant_see_list_of_all_users(self):
@@ -84,7 +84,7 @@ class TestUserAdmin(LoggedInTestCase):
         # test for https://github.com/kiwitcms/Kiwi/issues/642
         self.client.login(  # nosec:B106:hardcoded_password_funcarg
             username=self.admin.username,
-            password='admin-password')
+            password='admin-passwordpasswordpassword')
         response = self.client.get('/admin/auth/user/add/')
 
         self.assertEqual(HTTPStatus.OK, response.status_code)
@@ -92,11 +92,11 @@ class TestUserAdmin(LoggedInTestCase):
     def test_admin_can_add_new_users(self):
         self.client.login(  # nosec:B106:hardcoded_password_funcarg
             username=self.admin.username,
-            password='admin-password')
+            password='admin-passwordpasswordpassword')
         response = self.client.post('/admin/auth/user/add/', {
             'username': 'added-by-admin',
-            'password1': 'xo-xo-xo',
-            'password2': 'xo-xo-xo',
+            'password1': 'xo-xo-xo-xo-xo-xo-xo-xo-xo',
+            'password2': 'xo-xo-xo-xo-xo-xo-xo-xo-xo',
         }, follow=True)
 
         self.assertEqual(HTTPStatus.OK, response.status_code)
